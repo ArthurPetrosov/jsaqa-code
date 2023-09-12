@@ -1,22 +1,48 @@
 const { test, expect } = require("@playwright/test");
+const { chromium } = require("playwright");
+const { email, password, negativPassword } = require("../user");
 
-test("test", async ({ page }) => {
-  // Go to https://netology.ru/free/management#/
-  await page.goto("https://netology.ru/free/management#/");
+test("Successful authorization", async () => {
+  const browser = await chromium.launch({
+    headless: false,
+    slowMo: 500,
+  });
+  const page = await browser.newPage("https://netology.ru/");
+  await page.goto("https://netology.ru/");
 
-  // Click a
-  await page.click("a");
-  await expect(page).toHaveURL("https://netology.ru/");
+  await page.getByRole("link", { name: "Войти" }).click();
+  await expect(page).toHaveURL("https://netology.ru/?modal=sign_in");
 
-  // Click text=Учиться бесплатно
-  await page.click("text=Учиться бесплатно");
-  await expect(page).toHaveURL("https://netology.ru/free");
+  await page.getByPlaceholder("Email").click();
+  await page.getByPlaceholder("Email").fill(email);
+  await page.getByPlaceholder("Пароль").click();
+  await page.getByPlaceholder("Пароль").fill(password);
+  await page.getByTestId("login-submit-btn").click();
 
-  page.click("text=Бизнес и управление");
+  await expect(page).toHaveURL("https://netology.ru/profile");
+  await expect(page.locator("h2")).toHaveText("Моё обучение");
+  browser.close();
+}, 60000);
 
-  // Click text=Как перенести своё дело в онлайн
-  await page.click("text=Как перенести своё дело в онлайн");
-  await expect(page).toHaveURL(
-    "https://netology.ru/programs/kak-perenesti-svoyo-delo-v-onlajn-bp"
-  );
-});
+test("Failed authorization", async () => {
+  const browser = await chromium.launch({
+    headless: false,
+    slowMo: 500,
+  });
+  const page = await browser.newPage("https://netology.ru/");
+  await page.goto("https://netology.ru/");
+
+  await page.getByRole("link", { name: "Войти" }).click();
+  await expect(page).toHaveURL("https://netology.ru/?modal=sign_in");
+
+  await page.getByPlaceholder("Email").click();
+  await page.getByPlaceholder("Email").fill(email);
+  await page.getByPlaceholder("Пароль").click();
+  await page.getByPlaceholder("Пароль").fill(negativPassword);
+  await page.getByTestId("login-submit-btn").click();
+
+  const error = await page.locator('[data-testid="login-error-hint"]');
+  await expect(error).toHaveText("Вы ввели неправильно логин или пароль");
+
+  browser.close();
+}, 60000);
