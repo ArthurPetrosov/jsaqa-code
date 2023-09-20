@@ -1,5 +1,21 @@
-Feature: Search a course
-    Scenario: Should search by text
-        Given user is on "/navigation" page
-        When user search by "тестировщик"
-        Then user sees the course suggested "Тестировщик ПО"
+Feature: Бронирование билетов
+
+    Scenario: Клиент покупает один билет
+        Given клиент находится на странице "/index.php"
+        When клиент выбирает 2-й день 
+        When клиент выбирает время
+        When клиент выбирает 1-й ряд 1 место
+        Then клиент видит сообщение Вы выбрали билеты:
+
+    Scenario: Клиент покупает два билета
+        Given клиент находится на странице "/index.php"
+        When клиент выбирает 2-й день 
+        When клиент выбирает время
+        When клиент выбирает 1-й ряд 1 место
+        Then клиент видит сообщение Вы выбрали билеты:
+    
+    Scenario: Клиент бронирует без выбора места
+        Given клиент находится на странице "/index.php"
+        When клиент выбирает 2-й день
+        When клиент выбирает время
+        Then кнопка Забронировать не активна
